@@ -53,6 +53,8 @@ export class MessageGateway
   }
 
   handleConnection(client: Socket, ...args: any[]) {
+    console.log('client', client);
+
     this.logger.log(`Client connected: ${client.id}`);
   }
 
