@@ -9,4 +9,18 @@ export class UsersService {
     @InjectModel('User')
     private readonly userModel: Model<User>,
   ) {}
+
+  async saveMessageUser(name: string, text: string) {
+    const userText = {
+      name,
+      text,
+    };
+
+    try {
+      const user = new this.userModel(userText);
+      return await user.save();
+    } catch (e) {
+      console.log('e', e);
+    }
+  }
 }

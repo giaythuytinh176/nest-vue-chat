@@ -9,19 +9,22 @@ import {
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { Interval } from '@nestjs/schedule';
+import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway()
 export class MessageGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  constructor(private readonly usersService: UsersService) {}
+
   @WebSocketServer() server: Server;
 
   private logger: Logger = new Logger('AppGateway');
 
-  // @Interval(10000)
+  //@Interval(1000)
   @SubscribeMessage('msgToServer')
-  handleMessage(client: Socket, payload: string): void {
-    // this.logger.debug('Called handleMessage after 5 seconds');
+  async handleMessage(client: Socket, payload: string): Promise<void> {
+    // this.logger.debug('Called handleMessage after 1 seconds');
 
     let payload1: any;
     if (!payload) {
@@ -30,6 +33,13 @@ export class MessageGateway
         text: this.makeid(5),
       };
     }
+
+    const payload2 = payload ?? payload1;
+    const userText = await this.usersService.saveMessageUser(
+      payload2.name,
+      payload2.text,
+    );
+
     this.logger.log(`Sending message: ${JSON.stringify(payload ?? payload1)}`);
     this.server.emit('msgToClient', payload ?? payload1);
   }
