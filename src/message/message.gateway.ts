@@ -11,15 +11,18 @@ import { Socket, Server } from 'socket.io';
 import { Interval } from '@nestjs/schedule';
 
 @WebSocketGateway()
-export class AppGateway
+export class MessageGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
 
   private logger: Logger = new Logger('AppGateway');
 
+  // @Interval(10000)
   @SubscribeMessage('msgToServer')
   handleMessage(client: Socket, payload: string): void {
+    // this.logger.debug('Called handleMessage after 5 seconds');
+
     let payload1: any;
     if (!payload) {
       payload1 = {
@@ -27,7 +30,6 @@ export class AppGateway
         text: this.makeid(5),
       };
     }
-    this.logger.debug('Called handleMessage after 5 seconds');
     this.logger.log(`Sending message: ${JSON.stringify(payload ?? payload1)}`);
     this.server.emit('msgToClient', payload ?? payload1);
   }
